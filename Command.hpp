@@ -32,6 +32,7 @@ class Command
 		std::string		*getExtra() const;
 
 		int							parseStr(std::string str);
+		int							parseStr1(std::string str);
 		std::vector<std::string>	parseParam(std::string param);
 		void						execute();
 		void						numeric_reply(int key, std::string rply="", int socket=0);

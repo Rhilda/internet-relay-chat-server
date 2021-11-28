@@ -3,9 +3,7 @@
 Command::Command(std::string str, Server &server, User &commander) : _server(server), _commander(commander)
 {
 	this->_params = new std::string[5];
-	this->_extra = new std::string[5];
-	if (!parseStr(str))
-		return ;				
+	this->_extra = new std::string[5];			
 	return;
 }
 
@@ -23,13 +21,38 @@ int		Command::parseStr(std::string str)
 	int pos1 = 0;
 	int pos2 = str.find(" ");
 	this->_command = str.substr(pos1, pos2);
+	
 	int i = 0;
 	while (i < 5)			
 	{
 		pos1 = pos2 + 1;
 		pos2 = str.find(" ", pos1);
 		if (pos2 == std::string::npos || str[pos1] == ':')
-			pos2 = str.find("\r\n", pos1);
+			pos2 = str.find("\r", pos1);
+		if (pos2 <= pos1)
+			break;
+		if (str[pos1] == ':')
+			pos1++;
+		this->_params[i++] = str.substr(pos1, pos2 - pos1);
+	}
+	this->_paramsNum = i;
+	return (0);
+}
+
+int		Command::parseStr1(std::string str)
+{
+	if (str.empty())
+		return (-1);						
+	int pos1 = 0;
+	int pos2 = str.find(" ");
+	this->_command = str.substr(pos1, pos2);
+	int i = 0;
+	while (i < 5)			
+	{
+		pos1 = pos2 + 1;
+		pos2 = str.find(" ", pos1);
+		if (pos2 == std::string::npos || str[pos1] == ':')
+			pos2 = str.find("\n", pos1);
 		if (pos2 <= pos1)
 			break;
 		if (str[pos1] == ':')
@@ -74,7 +97,7 @@ void		Command::execute(void)
 		{
 			if (this->_command == "OPER")
 				this->ftOPER();
-			else if (this->_command == "QUIT")
+			else if (this->_command.find("QUIT") == 0)
 				this->ftQUIT();
 			else if (this->_command == "JOIN")
 				this->ftJOIN();
@@ -84,7 +107,7 @@ void		Command::execute(void)
 				this->ftTOPIC();
 			else if (this->_command == "NAMES")
 				this->ftNAMES();
-			else if (this->_command == "LIST")
+			else if (this->_command.find("LIST") == 0)
 				this->ftLIST();
 			else if (this->_command == "KICK")
 				this->ftKICK();
@@ -117,11 +140,11 @@ void			Command::ftPASS()
 		return ;
 	}
 
-	// if (this->_params[0] != this->_server.getPassword())
-	// {
-	// 	this->numeric_reply(464);
-	// 	return ;
-	// }
+	if (this->_params[0] != this->_server.getPassword())
+	{
+		this->numeric_reply(464);
+		return ;
+	}
 
 	this->_commander.setPassword(true);
 	return;

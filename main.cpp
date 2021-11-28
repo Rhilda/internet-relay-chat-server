@@ -77,20 +77,33 @@ int main(int ac, char **av)
 				else
 				{					
 					info += buff;
-					// std::cout << info;
-					// int len = info.length();
-					// char  *str = (char *)info.c_str();
-					// for (size_t i = 0; i < len; i++)
-					// {
-					// 	int c = str[i];
-					// 	std::cout << c << ": " << str[i] << std::endl;
-					// }
-					
 					User *client = server.getSocketUser(i);
-					if (info.find("\r\n") != std::string::npos || info.find("\n") != std::string::npos)
+					if (info.find("\r\n") != std::string::npos)
 					{
-						//std::cout << "[" << info << "]" <<std::endl;
+					char *str = (char *)info.c_str();	
+					char *pch = strtok(str, "\n");
+					std::vector<char *> arr;
+ 
+  					while (pch != NULL)                         
+  					{
+						arr.push_back(pch);
+						pch = strtok (NULL, "\n");
+					}					
+
+						for (size_t i = 0; i < arr.size(); i++)
+						{
+							std::string sr = std::string(arr[i]);
+							Command cmd(sr, server, *client);
+							cmd.parseStr(sr);
+							cmd.execute();
+						}
+						
+						info.clear();
+					}
+					else if (info.find("\n") != std::string::npos)
+					{
 						Command cmd(info, server, *client);
+						cmd.parseStr1(info);
 						cmd.execute();
 						info.clear();
 					}
