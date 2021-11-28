@@ -89,7 +89,7 @@ int main(int ac, char **av)
 					User *client = server.getSocketUser(i);
 					if (info.find("\r\n") != std::string::npos || info.find("\n") != std::string::npos)
 					{
-						std::cout << "[" << info << "]" <<std::endl;
+						//std::cout << "[" << info << "]" <<std::endl;
 						Command cmd(info, server, *client);
 						cmd.execute();
 						info.clear();
